@@ -45,7 +45,7 @@ echo "deb [arch=amd64 signed-by=/usr/share/keyrings/google-chrome-keyring.gpg] h
 sudo apt update
 sudo apt modernize-sources -y
 
-# Install desktop packages
+# Install desktop packages (qtile removed - will install separately)
 echo "Installing desktop packages..."
 read -p "Press Enter to continue..."
 
@@ -68,7 +68,6 @@ sudo apt install -y \
     pipewire-pulse \
     pipewire-audio \
     pipewire-alsa \
-    qtile \
     x11-xserver-utils \
     xclip \
     xorg \
@@ -164,6 +163,48 @@ tar -czf dmenu-patched-backup.tar.gz dmenu/
 # Cleanup downloaded archives
 rm -f st-0.9.2.tar.gz
 
+# Install Qtile with uv (reliable method)
+echo "Installing Qtile with uv..."
+read -p "Press Enter to continue..."
+
+# Install Python development dependencies
+sudo apt install -y \
+    python3-dev \
+    python3-venv \
+    libpangocairo-1.0-0 \
+    libxcb-render0-dev \
+    libffi-dev \
+    libcairo2 \
+    libpango-1.0-0 \
+    libgdk-pixbuf2.0-0 \
+    libxcb-xinerama0-dev \
+    libxcb-randr0-dev
+
+# Install uv
+curl -LsSf https://astral.sh/uv/install.sh | sh
+source ~/.cargo/env
+
+# Create isolated qtile environment
+uv venv ~/.qtile-env
+source ~/.qtile-env/bin/activate
+
+# Install qtile
+uv pip install qtile
+
+# Create qtile launcher script
+sudo tee /usr/local/bin/qtile > /dev/null << 'EOF'
+#!/bin/bash
+source ~/.qtile-env/bin/activate
+exec python -m qtile "$@"
+EOF
+
+sudo chmod +x /usr/local/bin/qtile
+
+# Test installation
+echo "Testing Qtile installation..."
+source ~/.qtile-env/bin/activate
+python -c "import qtile; print('Qtile version:', qtile.__version__)"
+
 # Configure Qtile
 echo "Configuring Qtile..."
 read -p "Press Enter to continue..."
@@ -185,7 +226,6 @@ flatpak remote-add --if-not-exists --user flathub https://flathub.org/repo/flath
 # Install applications
 flatpak install -y --user flathub org.flameshot.Flameshot
 flatpak install -y --user flathub com.protonvpn.www
-flatpak install -y --user flathub com.bitwarden.desktop
 
 # Apply theme overrides for all Flatpak applications
 flatpak override --user --env=GTK_THEME=Tokyonight-Dark
