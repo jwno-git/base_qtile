@@ -17,7 +17,7 @@ xset -dpms     # Disable DPMS (Display Power Management Signaling)
 xrdb ~/.Xresources
 
 # Set wallpaper
-feh --bg-scale ~/Pictures/Wallpapers/wallpaper-fractal.jpg &
+feh --bg-fill ~/Pictures/Wallpapers/wallpaper-fractal.jpg &
 
 # Enable touchpad tap-to-click (dynamic device detection)
 TOUCHPAD_ID=$(xinput list | grep -i touchpad | grep -o 'id=[0-9]*' | cut -d= -f2)
