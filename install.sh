@@ -15,6 +15,7 @@ echo "Setting up desktop configuration files..."
 read -p "Press Enter to continue..."
 
 cp -r "$HOME/base_qtile/.config/"* "$HOME/.config/"
+cp -r "$HOME/base_qtile/.local/"* "$HOME/.local/"
 mv "$HOME/base_qtile/.xinitrc" "$HOME/"
 mv "$HOME/base_qtile/.Xresources" "$HOME/"
 mv "$HOME/base_qtile/.icons" "$HOME/"
@@ -184,6 +185,7 @@ flatpak remote-add --if-not-exists --user flathub https://flathub.org/repo/flath
 # Install applications
 flatpak install -y --user flathub org.flameshot.Flameshot
 flatpak install -y --user flathub com.protonvpn.www
+flatpak install -y --user flathub com.bitwarden.desktop
 
 # Apply theme overrides for all Flatpak applications
 flatpak override --user --env=GTK_THEME=Tokyonight-Dark
@@ -197,5 +199,38 @@ read -p "Press Enter to continue..."
 systemctl --user enable pipewire
 systemctl --user enable pipewire-pulse
 systemctl --user enable wireplumber
+
+# Setup monitor hotplug udev rule
+echo "Setting up monitor hotplug detection..."
+read -p "Press Enter to continue..."
+
+# Create udev rule for monitor hotplug
+sudo tee /etc/udev/rules.d/95-monitor-hotplug.rules > /dev/null << 'EOF'
+ACTION=="change", SUBSYSTEM=="drm", ENV{HOTPLUG}=="1", RUN+="/usr/local/bin/monitor-hotplug.sh"
+EOF
+
+# Create hotplug script
+sudo tee /usr/local/bin/monitor-hotplug.sh > /dev/null << 'EOF'
+#!/bin/bash
+
+# Log the event
+echo "$(date): Monitor hotplug event detected" >> /tmp/monitor-hotplug.log
+
+# Find the user running X session
+DISPLAY_USER=$(who | grep -E "\(:0\)|tty7" | head -n1 | awk '{print $1}')
+
+if [ -n "$DISPLAY_USER" ]; then
+    # Run the monitor config as the user
+    sudo -u "$DISPLAY_USER" DISPLAY=:0 /home/"$DISPLAY_USER"/.local/bin/monitor-config.sh
+    echo "$(date): Executed monitor-config.sh for user $DISPLAY_USER" >> /tmp/monitor-hotplug.log
+else
+    echo "$(date): No active X session found" >> /tmp/monitor-hotplug.log
+fi
+EOF
+
+sudo chmod +x /usr/local/bin/monitor-hotplug.sh
+
+# Reload udev rules
+sudo udevadm control --reload-rules
 
 echo "Qtile desktop environment setup complete. Reboot recommended."
