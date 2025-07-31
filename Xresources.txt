@@ -1,0 +1,3 @@
+! X11 Cursor Configuration
+Xcursor.theme: BreezeX-RosePine-Linux
+Xcursor.size: 24
