@@ -15,7 +15,6 @@ echo "Setting up desktop configuration files..."
 read -p "Press Enter to continue..."
 
 cp -r "$HOME/base_qtile/.config/"* "$HOME/.config/"
-cp -r "$HOME/base_qtile/.local/"* "$HOME/.local/"
 mv "$HOME/base_qtile/.xinitrc" "$HOME/"
 mv "$HOME/base_qtile/.Xresources" "$HOME/"
 mv "$HOME/base_qtile/.icons" "$HOME/"
@@ -185,7 +184,6 @@ flatpak remote-add --if-not-exists --user flathub https://flathub.org/repo/flath
 # Install applications
 flatpak install -y --user flathub org.flameshot.Flameshot
 flatpak install -y --user flathub com.protonvpn.www
-flatpak install -y --user flathub com.bitwarden.desktop
 
 # Apply theme overrides for all Flatpak applications
 flatpak override --user --env=GTK_THEME=Tokyonight-Dark
