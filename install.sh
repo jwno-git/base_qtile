@@ -147,18 +147,18 @@ tar -czf sxiv-backup.tar.gz sxiv/
 # tar -czf slock-patched-backup.tar.gz slock/
 
 # Build dmenu
-echo "Building dmenu..."
-read -p "Press Enter to continue..."
+# echo "Building dmenu..."
+# read -p "Press Enter to continue..."
 
-git clone https://git.suckless.org/dmenu
-cd dmenu
-wget https://tools.suckless.org/dmenu/patches/alpha/dmenu-alpha-20230110-5.2.diff
+# git clone https://git.suckless.org/dmenu
+# cd dmenu
+# wget https://tools.suckless.org/dmenu/patches/alpha/dmenu-alpha-20230110-5.2.diff
 
-patch -p1 < dmenu-alpha-20230110-5.2.diff
-make clean
-sudo make install
-cd ..
-tar -czf dmenu-patched-backup.tar.gz dmenu/
+# patch -p1 < dmenu-alpha-20230110-5.2.diff
+# make clean
+# sudo make install
+# cd ..
+# tar -czf dmenu-patched-backup.tar.gz dmenu/
 
 # Cleanup downloaded archives
 rm -f st-0.9.2.tar.gz
