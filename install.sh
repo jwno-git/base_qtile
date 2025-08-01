@@ -1,5 +1,5 @@
 #!/bin/bash
-# Debian Trixie Qtile Desktop Environment Setup
+# Debian Trixie Desktop Environment Setup (without Qtile)
 # Run as regular user with sudo
 # Prerequisites: base_tty script must be run first
 
@@ -8,7 +8,7 @@ set -e
 # Check user
 [[ $EUID -eq 0 ]] && { echo "Run as user, not root"; exit 1; }
 
-echo "Starting Qtile desktop environment setup..."
+echo "Starting desktop environment setup..."
 
 # Move desktop configuration files
 echo "Setting up desktop configuration files..."
@@ -45,7 +45,7 @@ echo "deb [arch=amd64 signed-by=/usr/share/keyrings/google-chrome-keyring.gpg] h
 sudo apt update
 sudo apt modernize-sources -y
 
-# Install desktop packages (qtile removed - will install separately)
+# Install desktop packages
 echo "Installing desktop packages..."
 read -p "Press Enter to continue..."
 
@@ -163,56 +163,10 @@ tar -czf sxiv-backup.tar.gz sxiv/
 # Cleanup downloaded archives
 rm -f st-0.9.2.tar.gz
 
-# Install Qtile with uv (reliable method)
-echo "Installing Qtile with uv..."
-read -p "Press Enter to continue..."
-
-# Install Python development dependencies
-sudo apt install -y \
-    python3-dev \
-    python3-venv \
-    libpangocairo-1.0-0 \
-    libxcb-render0-dev \
-    libffi-dev \
-    libcairo2 \
-    libpango-1.0-0 \
-    libgdk-pixbuf-2.0-0 \
-    libxcb-xinerama0-dev \
-    libxcb-randr0-dev
-
-# Install uv
-curl -LsSf https://astral.sh/uv/install.sh | sh
-
-# Add uv to PATH
-export PATH="$HOME/.local/bin:$PATH"
-
-# Create isolated qtile environment
-python3 -m venv ~/.qtile-env
-source ~/.qtile-env/bin/activate
-
-# Install qtile
-pip install qtile
-
-# Create qtile launcher script
-sudo tee /usr/local/bin/qtile > /dev/null << 'EOF'
-#!/bin/bash
-source ~/.qtile-env/bin/activate
-exec python -m qtile "$@"
-EOF
-
-sudo chmod +x /usr/local/bin/qtile
-
-# Test installation
-echo "Testing Qtile installation..."
-source ~/.qtile-env/bin/activate
-python -c "import qtile; print('Qtile version:', qtile.__version__)"
-deactivate
-
-# Configure Qtile
-echo "Configuring Qtile..."
-read -p "Press Enter to continue..."
-
 # Install themes system-wide
+echo "Installing themes system-wide..."
+read -p "Press Enter to continue..."
+
 sudo cp -r "$HOME/.icons/BreezeX-RosePine-Linux" /usr/share/icons/
 sudo cp -r "$HOME/.themes/Tokyonight-Dark" /usr/share/themes/
 
@@ -276,4 +230,4 @@ sudo chmod +x /usr/local/bin/monitor-hotplug.sh
 # Reload udev rules
 sudo udevadm control --reload-rules
 
-echo "Qtile desktop environment setup complete. Reboot recommended."
+echo "Desktop environment setup complete. Reboot recommended."
