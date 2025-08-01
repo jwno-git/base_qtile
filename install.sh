@@ -187,11 +187,11 @@ curl -LsSf https://astral.sh/uv/install.sh | sh
 export PATH="$HOME/.local/bin:$PATH"
 
 # Create isolated qtile environment
-uv venv ~/.qtile-env
+python3 -m venv ~/.qtile-env
 source ~/.qtile-env/bin/activate
 
 # Install qtile
-uv pip install qtile
+pip install qtile
 
 # Create qtile launcher script
 sudo tee /usr/local/bin/qtile > /dev/null << 'EOF'
