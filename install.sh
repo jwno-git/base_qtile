@@ -8,8 +8,6 @@ set -e
 # Check user
 [[ $EUID -eq 0 ]] && { echo "Run as user, not root"; exit 1; }
 
-echo "Starting desktop environment setup..."
-
 # Move desktop configuration files
 echo "Setting up desktop configuration files..."
 read -p "Press Enter to continue..."
@@ -20,10 +18,6 @@ mv "$HOME/base_qtile/.xinitrc" "$HOME/"
 mv "$HOME/base_qtile/.Xresources" "$HOME/"
 mv "$HOME/base_qtile/.icons" "$HOME/"
 mv "$HOME/base_qtile/.themes" "$HOME/"
-
-# Move battery toggle script
-sudo mv "$HOME/base_qtile/battery-toggle" /usr/local/bin/
-sudo chmod +x /usr/local/bin/battery-toggle
 
 # Extract and setup themes
 echo "Extracting and setting up themes..."
