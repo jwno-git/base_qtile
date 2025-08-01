@@ -176,13 +176,15 @@ sudo apt install -y \
     libffi-dev \
     libcairo2 \
     libpango-1.0-0 \
-    libgdk-pixbuf2.0-0 \
+    libgdk-pixbuf-2.0-0 \
     libxcb-xinerama0-dev \
     libxcb-randr0-dev
 
 # Install uv
 curl -LsSf https://astral.sh/uv/install.sh | sh
-source ~/.cargo/env
+
+# Add uv to PATH
+export PATH="$HOME/.local/bin:$PATH"
 
 # Create isolated qtile environment
 uv venv ~/.qtile-env
@@ -204,6 +206,7 @@ sudo chmod +x /usr/local/bin/qtile
 echo "Testing Qtile installation..."
 source ~/.qtile-env/bin/activate
 python -c "import qtile; print('Qtile version:', qtile.__version__)"
+deactivate
 
 # Configure Qtile
 echo "Configuring Qtile..."
