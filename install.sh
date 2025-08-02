@@ -1,5 +1,5 @@
 #!/bin/bash
-# Debian Trixie Desktop Environment Setup (without Qtile)
+# Debian Trixie Desktop Environment Setup with Qtile
 # Run as regular user with sudo
 # Prerequisites: base_tty script must be run first
 
@@ -45,6 +45,7 @@ read -p "Press Enter to continue..."
 
 sudo apt install -y \
     bluez \
+    blueman \
     brightnessctl \
     dunst \
     firefox-esr-l10n-en-ca \
@@ -57,15 +58,35 @@ sudo apt install -y \
     network-manager-applet \
     pavucontrol \
     picom \
-    pipewire \
-    pipewire-pulse \
-    pipewire-audio \
-    pipewire-alsa \
+    pulseaudio \
+    pulseaudio-utils \
+    pulseaudio-module-bluetooth \
+    python3-venv \
+    python3-pip \
+    python3-dev \
+    libpangocairo-1.0-0 \
+    libxcb-cursor0 \
     x11-xserver-utils \
     xclip \
     xorg \
     xserver-xorg \
     xinit
+
+# Install Qtile with venv
+echo "Installing Qtile with Python virtual environment..."
+read -p "Press Enter to continue..."
+
+# Create venv for qtile
+python3 -m venv ~/.qtile-venv
+
+# Activate venv
+source ~/.qtile-venv/bin/activate
+
+# Install qtile and dependencies
+pip install qtile pulsectl-asyncio
+
+# Deactivate venv for now
+deactivate
 
 # Build suckless tools
 echo "Building suckless tools..."
@@ -185,42 +206,16 @@ flatpak override --user --env=XCURSOR_THEME=BreezeX-RosePine-Linux
 echo "Configuring desktop services..."
 read -p "Press Enter to continue..."
 
-# Enable user services
-systemctl --user enable pipewire
-systemctl --user enable pipewire-pulse
-systemctl --user enable wireplumber
+# Enable PulseAudio services (user session will start automatically)
+systemctl --user --global enable pulseaudio.service
+systemctl --user --global enable pulseaudio.socket
 
-# Setup monitor hotplug udev rule
-echo "Setting up monitor hotplug detection..."
+# Update .xinitrc to use qtile from venv
+echo "Updating .xinitrc for Qtile venv..."
 read -p "Press Enter to continue..."
 
-# Create udev rule for monitor hotplug
-sudo tee /etc/udev/rules.d/95-monitor-hotplug.rules > /dev/null << 'EOF'
-ACTION=="change", SUBSYSTEM=="drm", ENV{HOTPLUG}=="1", RUN+="/usr/local/bin/monitor-hotplug.sh"
-EOF
+sed -i 's|exec qtile start|source ~/.qtile-venv/bin/activate \&\& exec qtile start|' ~/.xinitrc
 
-# Create hotplug script
-sudo tee /usr/local/bin/monitor-hotplug.sh > /dev/null << 'EOF'
-#!/bin/bash
-
-# Log the event
-echo "$(date): Monitor hotplug event detected" >> /tmp/monitor-hotplug.log
-
-# Find the user running X session
-DISPLAY_USER=$(who | grep -E "\(:0\)|tty7" | head -n1 | awk '{print $1}')
-
-if [ -n "$DISPLAY_USER" ]; then
-    # Run the monitor config as the user
-    sudo -u "$DISPLAY_USER" DISPLAY=:0 /home/"$DISPLAY_USER"/.local/bin/monitor-config.sh
-    echo "$(date): Executed monitor-config.sh for user $DISPLAY_USER" >> /tmp/monitor-hotplug.log
-else
-    echo "$(date): No active X session found" >> /tmp/monitor-hotplug.log
-fi
-EOF
-
-sudo chmod +x /usr/local/bin/monitor-hotplug.sh
-
-# Reload udev rules
-sudo udevadm control --reload-rules
-
-echo "Desktop environment setup complete. Reboot recommended."
+echo "Desktop environment setup complete with Qtile and PulseAudio."
+echo "To start: startx"
+echo "Qtile will be available in virtual environment at ~/.qtile-venv"
