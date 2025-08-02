@@ -1,5 +1,5 @@
 #!/bin/bash
-# Debian Trixie Desktop Environment Setup with Qtile
+# Debian Trixie Desktop Environment Setup (No Qtile)
 # Run as regular user with sudo
 # Prerequisites: base_tty script must be run first
 
@@ -75,22 +75,6 @@ sudo apt install -y \
     xorg \
     xserver-xorg \
     xinit
-
-# Install Qtile with venv
-echo "Installing Qtile with Python virtual environment..."
-read -p "Press Enter to continue..."
-
-# Create venv for qtile
-python3 -m venv ~/.qtile-venv
-
-# Activate venv
-source ~/.qtile-venv/bin/activate
-
-# Install qtile and dependencies
-pip install qtile pulsectl-asyncio
-
-# Deactivate venv for now
-deactivate
 
 # Build suckless tools
 echo "Building suckless tools..."
@@ -214,12 +198,5 @@ read -p "Press Enter to continue..."
 systemctl --user --global enable pulseaudio.service
 systemctl --user --global enable pulseaudio.socket
 
-# Update .xinitrc to use qtile from venv
-echo "Updating .xinitrc for Qtile venv..."
-read -p "Press Enter to continue..."
-
-sed -i 's|exec qtile start|source ~/.qtile-venv/bin/activate \&\& exec qtile start|' ~/.xinitrc
-
-echo "Desktop environment setup complete with Qtile and PulseAudio."
-echo "To start: startx"
-echo "Qtile will be available in virtual environment at ~/.qtile-venv"
+echo "Desktop environment setup complete (no window manager installed)."
+echo "Install your preferred window manager separately."
