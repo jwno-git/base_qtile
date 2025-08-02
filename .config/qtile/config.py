@@ -186,20 +186,16 @@ screens = [
                     },
                     name_transform=lambda name: name.upper(),
                 ),
-		widget.TextBox(
-			text="  ",
+		widget.PulseVolume(
     			background="#00000000",
-    			foreground="#777777",
-    			padding=0,
-		),
-		widget.Volume(
-			background="#00000000",
     			foreground="#FFFFFF",
-    			fmt="{}",  # Just shows percentage like "45%"
-    			update_interval=0.1,  # Real-time updates
-			mouse_callbacks={
+    			emoji=True,
+    			emoji_list=['🔇', '🔈', '🔉', '🔊'],
+    			unmute_format="{volume}%",
+    			mute_format="MUTE",
+    			mouse_callbacks={
         		'Button1': lambda: qtile.spawn('pavucontrol')
-    			},
+    			},	
 		),
 		widget.TextBox(
 			text=" ",
@@ -213,17 +209,6 @@ screens = [
 			fmt="{}",
 			backlight_name="amdgpu_bl0",
 			update_interval=0.1,
-		),
-		widget.TextBox(
-			text="   ",
-    			background="#00000000",
-    			foreground="#00B399",
-    			padding=0,
-		),
-		DynamicBattery(
-			background="#00000000",
-    			foreground="#FFFFFF",
-    			update_interval=30,
 		),
 		widget.TextBox(
 			text="   ",
