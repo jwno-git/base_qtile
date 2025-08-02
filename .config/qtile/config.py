@@ -6,17 +6,6 @@ from libqtile.widget import base
 import subprocess
 import os
 
-class DynamicBattery(base.ThreadPoolText):
-    def __init__(self, **config):
-        super().__init__("", **config)
-        self.add_defaults(base.ThreadPoolText.defaults)
-        
-    def poll(self):
-        text, color = get_battery_status()
-        # Update the foreground color
-        self.foreground = color
-        return text
-
 def get_battery_capacity_once():
     try:
         import subprocess
@@ -33,23 +22,6 @@ def get_battery_capacity_once():
     except:
         return "Error"
 
-def get_battery_status():
-    try:
-        with open('/sys/class/power_supply/BATT/status', 'r') as f:
-            status = f.read().strip()
-        with open('/sys/class/power_supply/BATT/capacity', 'r') as f:
-            capacity = int(f.read().strip())
-        
-        if status == 'Full':
-            return ('Full', '#FFFFFF')
-        elif status == 'Charging':
-            return (f'{capacity}% chrg', '#FFFFFF')
-        else:  # Discharging or other
-            color = '#FF0000' if capacity <= 15 else '#FFFFFF'
-            return (f'{capacity}%', color)
-    except:
-        return ('Unknown', '#FFFFFF')
-
 @hook.subscribe.startup_once
 def autostart():
     subprocess.run(["xsetroot", "-cursor_name", "left_ptr"])
@@ -58,8 +30,6 @@ def autostart():
     subprocess.Popen(["sh", "-c", "while true; do xclip -selection clipboard -t text/plain -o 2>/dev/null | cliphist store 2>/dev/null; sleep 1; done"])
     subprocess.Popen(["dunst"])
     # Autostart systray applications
-    # subprocess.Popen(["flatpak", "run", "com.slack.Slack"])
-    # subprocess.Popen(["flatpak", "run", "com.protonvpn.www"])
     # subprocess.Popen(["flatpak", "run", "com.discordapp.Discord"])
     # subprocess.Popen(["flatpak", "run", "com.protonvpn.www"])
 
@@ -68,46 +38,44 @@ terminal = "st"
 
 # Keybinds
 keys = [
-    # Key([mod], "a", , desc=""),  # a - removed rofi
-    Key([mod], "b",lazy.spawn("sudo /usr/local/bin/battery-toggle"), desc="Toggle battery charge threshold (80%/100%)"),
-    Key([mod], "c", lazy.spawn("sh -c \"cliphist list | dmenu -p 'Clipboard' | cliphist decode | xclip -selection clipboard\""), desc="Show clipboard history"),
-    Key([mod, "shift"], "c", lazy.spawn("sh -c \"cliphist wipe && dunstify 'Clipboard Cleared' -t 2000\""), desc="Clear clipboard history"),
-    # Key([mod], "d", , desc=""),  # d
-    # Key([mod], "e", , desc=""),  # e - removed lf
-    Key([mod], "f", lazy.window.toggle_fullscreen(), desc="Toggle fullscreen on the focused window"),  # f
-    # Key([mod], "g", , desc=""),  # g
-    # Key([mod], "h", , desc=""),  # h
-    # Key([mod], "i", , desc=""),  # i
-    # Key([mod], "j", , desc=""),  # j
-    # Key([mod], "k", , desc=""),  # k
-    Key([mod], "l", lazy.spawn("slock"), desc="Lock screen"),  # l
-    # Key([mod], "m", , desc=""),  # m
-    # Key([mod], "n", , desc=""),  # n
-    # Key([mod], "o", , desc=""),  # o
-    # Key([mod], "p", , desc=""),  # p
-    Key([mod], "q", lazy.window.kill(), desc="Kill focused window"),  # q
-    Key([mod, "shift"], "q", lazy.shutdown(), desc="Shutdown Qtile"),  # q + shift
-    # Key([mod], "r", , desc=""),  # r
-    Key([mod, "control"], "r", lazy.reload_config(), desc="Reload the config"),  # r + control
-    Key([mod], "s", lazy.spawn("flatpak run org.flameshot.Flameshot gui"), desc="Take screenshot with flameshot"),
-    # Key([mod], "t", , desc=""),  # t
-    # Key([mod], "u", , desc=""),  # u
-    # Key([mod], "v", , desc=""),  # v
-    Key([mod], "w", lazy.spawn("firefox")),  # w
-    # Key([mod], "x", , desc=""),  # x
-    # Key([mod], "y", , desc=""),  # y
-    # Key([mod], "z", , desc=""),  # z
-    Key([mod], "return", lazy.next_layout(), desc="Toggle between layouts"),  # return
-    Key([mod, "shift"], "Return", lazy.layout.toggle_split(), desc="Toggle between split and unsplit sides of stack"),  # return + shift
-    Key([mod], "space", lazy.group['scratchpad'].dropdown_toggle('terminal'), desc="Toggle terminal scratchpad"),  # space
-    Key([mod], "Tab", lazy.layout.next(), desc="Move window focus to other window"),  # tab
-    Key([mod], "Right", lazy.screen.next_group(), desc="Move to next group"),
-    Key([mod], "Left", lazy.screen.prev_group(), desc="Move to previous group"),
-    Key([], "XF86MonBrightnessUp", lazy.spawn("brightnessctl set 64+"), desc="Increase brightness"),  # brightness up
-    Key([], "XF86MonBrightnessDown", lazy.spawn("brightnessctl set 64-"), desc="Decrease brightness"),  # brightness down
-    Key([], "XF86AudioRaiseVolume", lazy.spawn("wpctl set-volume @DEFAULT_SINK@ 0.1+"), desc="Increase volume"),  # volume up
-    Key([], "XF86AudioLowerVolume", lazy.spawn("wpctl set-volume @DEFAULT_SINK@ 0.1-"), desc="Decrease volume"),  # volume down
-    Key([], "XF86AudioMute", lazy.spawn("wpctl set-mute @DEFAULT_SINK@ toggle"), desc="Toggle mute"),  # volume mute
+    # Key([mod], "a",),
+    # Key([mod], "b",),
+    # Key([mod], "c",),
+    # Key([mod], "d",),
+    # Key([mod], "e",),
+    # Key([mod], "f",),
+    # Key([mod], "g",),
+    # Key([mod], "h",), 
+    # Key([mod], "i",),
+    # Key([mod], "j",),
+    # Key([mod], "k",),
+    # Key([mod], "l", lazy.spawn("slock"),
+    # Key([mod], "m",),
+    # Key([mod], "n",),
+    # Key([mod], "o",), 
+    # Key([mod], "p",),
+    Key([mod], "q", lazy.window.kill(),
+    Key([mod, "shift"], "q", lazy.shutdown(),
+    # Key([mod], "r",),
+    Key([mod, "control"], "r", lazy.reload_config(),
+    Key([mod], "s", lazy.spawn("flatpak run org.flameshot.Flameshot gui"),
+    # Key([mod], "t",),
+    # Key([mod], "u",),
+    # Key([mod], "v",),
+    Key([mod], "w", lazy.spawn("firefox")), 
+    # Key([mod], "x",),
+    # Key([mod], "y",),
+    # Key([mod], "z",),
+    Key([mod], "return", lazy.next_layout(),
+    Key([mod], "space", lazy.group['scratchpad'].dropdown_toggle('terminal'), 
+    Key([mod], "Tab", lazy.layout.next(),
+    Key([mod], "Right", lazy.screen.next_group(),
+    Key([mod], "Left", lazy.screen.prev_group(),
+    Key([], "XF86MonBrightnessUp", lazy.spawn("brightnessctl set 64+"),
+    Key([], "XF86MonBrightnessDown", lazy.spawn("brightnessctl set 64-"),
+    Key([], "XF86AudioRaiseVolume", lazy.spawn("wpctl set-volume @DEFAULT_SINK@ 0.1+"),
+    Key([], "XF86AudioLowerVolume", lazy.spawn("wpctl set-volume @DEFAULT_SINK@ 0.1-"),
+    Key([], "XF86AudioMute", lazy.spawn("wpctl set-mute @DEFAULT_SINK@ toggle"),
 ]
 
 # Add key bindings to switch VTs in Wayland.
