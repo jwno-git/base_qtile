@@ -19,6 +19,10 @@ mv "$HOME/base_qtile/.Xresources" "$HOME/"
 mv "$HOME/base_qtile/.icons" "$HOME/"
 mv "$HOME/base_qtile/.themes" "$HOME/"
 
+# Setup wallpapers directory
+mkdir -p "$HOME/Pictures/Wallpapers"
+cp -r "$HOME/base_qtile/Pictures/Wallpapers/"* "$HOME/Pictures/Wallpapers/"
+
 # Extract and setup themes
 echo "Extracting and setting up themes..."
 read -p "Press Enter to continue..."
